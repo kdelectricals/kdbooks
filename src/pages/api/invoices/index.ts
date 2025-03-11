@@ -10,49 +10,64 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await sequelize.authenticate();
 
     if (req.method === "GET") {
-      // Fetch all invoices including items
+      // Fetch all invoices including their items
       const invoices = await Invoice.findAll({
-        include: [{ model: Item }],
+        include: [{ model: Item, as: "Items" }], // Ensure alias matches model associations
       });
 
       return res.status(200).json(invoices);
     } 
     
     else if (req.method === "POST") {
-      const { invoiceNo, reference, invoiceDate, customerId, items } = req.body;
+      const { invoiceNo, reference, invoiceDate, customerId, items, total } = req.body;
 
       console.log("🔹 Received Invoice Data:", JSON.stringify(req.body, null, 2));
 
       // ✅ Validate required fields
-      if (!invoiceNo || !invoiceDate || !customerId) {
-        return res.status(400).json({ message: "Missing required fields: invoiceNo, invoiceDate, or customerId" });
+      if (!invoiceNo || !invoiceDate || !customerId || !items || items.length === 0 || !total) {
+        return res.status(400).json({ message: "Missing required fields" });
       }
 
-      // ✅ Create new Invoice
-      const invoice = await Invoice.create({ 
-        InvoiceNo: invoiceNo, 
-        Reference: reference || "", 
-        InvoiceDate: invoiceDate, 
-        CustomerID: customerId 
-      });
+      const transaction = await sequelize.transaction();
+      try {
+        // ✅ Create new Invoice
+        const invoice = await Invoice.create(
+          { 
+            InvoiceNo: invoiceNo, 
+            Reference: reference || "", 
+            InvoiceDate: invoiceDate, 
+            CustomerID: customerId, 
+            Total: total, // Ensure total is stored
+          },
+          { transaction }
+        );
 
-      console.log("✅ Invoice Created:", invoice.toJSON());
+        console.log("✅ Invoice Created:", invoice.toJSON());
 
-      // ✅ Insert items if present
-      if (items && items.length > 0) {
+        // ✅ Insert items with all relevant fields
         const newItems = items.map((item: any) => ({
+          InvoiceID: invoice.InvoiceID, 
           ItemName: item.itemName,
           Quantity: item.quantity,
+          Unit: item.unit, 
+          HSN: item.hsn,
           Rate: item.rate,
-          Total: item.total,
-          InvoiceID: invoice.InvoiceID, // Associate with created invoice
+          Discount: item.discount,
+          DiscountedRate: item.discountedRate,
+          Total: item.total, // Ensure item total is stored
         }));
 
-        await Item.bulkCreate(newItems);
+        await Item.bulkCreate(newItems, { transaction });
         console.log("✅ Items Added:", newItems);
-      }
 
-      return res.status(201).json({ message: "Invoice created successfully", invoice });
+        await transaction.commit(); // Commit the transaction
+        return res.status(201).json({ message: "Invoice created successfully", invoice, items: newItems });
+
+      } catch (error) {
+        await transaction.rollback(); // Rollback on failure
+        console.error("❌ Error Creating Invoice:", error);
+        return res.status(500).json({ error: "Failed to create invoice", details: error.message });
+      }
     } 
     
     else {
