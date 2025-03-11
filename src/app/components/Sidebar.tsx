@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Divider, Tooltip } from "@mui/material";
 import { Home, Receipt, People, Settings, Menu, Logout } from "@mui/icons-material";
 import Link from "next/link";
+import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
   { text: "Dashboard", icon: <Home />, path: "/" },
@@ -14,6 +16,12 @@ const menuItems = [
 
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
+  const router = useRouter(); 
+
+  const handleLogout = async () =>{
+    await signOut({ redirect: false });
+    router.push("/login"); 
+  }
 
   return (
     <Drawer
@@ -60,12 +68,17 @@ export default function Sidebar() {
       {/* Logout Button */}
       <List>
         <ListItem disablePadding>
-          <ListItemButton sx={{ "&:hover": { backgroundColor: "#374151" } }}>
+          <ListItemButton onClick={handleLogout} sx={{ "&:hover": { backgroundColor: "#374151" } }}>
+       
             <ListItemIcon sx={{ color: "white" }}>
+          
               <Logout />
+             
             </ListItemIcon>
-            {open && <ListItemText primary="Logout" />}
+            {open && <ListItemText sx={{ color: "white" }} primary="Logout" />}
+          
           </ListItemButton>
+
         </ListItem>
       </List>
     </Drawer>
