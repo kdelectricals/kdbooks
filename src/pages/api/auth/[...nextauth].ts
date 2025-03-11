@@ -1,13 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
-import { setCookie } from "cookies-next";
-
-// Mock user database (Replace with real DB check)
-const users = [
-  { id: "1", email: "vzade1999@gmail.com", password: "Shree@123", role: "admin" },
-  { id: "2", email: "user@example.com", password: "$2a$10$uD....", role: "user" },
-];
+import Users  from "../../../../database/models/User"; // Sequelize model
 
 export default NextAuth({
   providers: [
@@ -18,24 +11,28 @@ export default NextAuth({
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        const user = users.find(u => u.email === credentials?.email);
-        if (!user) throw new Error("User not found");
-
-    
-        if(credentials?.password !== user.password){
-         throw new Error("Invalid credentials");
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Invalid credentials");
         }
+
+        // Fetch user from MySQL database
+        
+          const user = await Users.findOne({ where: { username: credentials.email } });
         
 
+       
+
+        if (!user || credentials.password !==user.dataValues.password) {
+          throw new Error("Invalid email or password");
+        }
+
         return { id: user.id, email: user.email, role: user.role };
-      }
-    })
+      },
+    }),
   ],
   callbacks: {
     async session({ session, token }) {
-      if (session.user) {
-        session.user.role = token.role;
-      }
+      session.user.role = token.role;
       return session;
     },
     async jwt({ token, user }) {
@@ -43,11 +40,8 @@ export default NextAuth({
         token.role = user.role;
       }
       return token;
-    }
+    },
   },
+  session: { strategy: "jwt", maxAge: 30 * 60 }, // 30 min expiration
   secret: process.env.NEXTAUTH_SECRET,
-  session: { strategy: "jwt", maxAge: 1800 }, // Auto-logout after 30 minutes
-  pages: {
-    signIn: "/login",
-  },
 });

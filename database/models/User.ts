@@ -1,11 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config";
 
-class User extends Model {}
+class Users extends Model {
+  email: string | null | undefined;
+  role: unknown;
+  id: string;
+}
 
-User.init(
+Users.init(
   {
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    UserID: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     username: { type: DataTypes.STRING, allowNull: false, unique: true },
     password: { type: DataTypes.STRING, allowNull: false },
     firstName: { type: DataTypes.STRING, allowNull: false },
@@ -13,7 +17,7 @@ User.init(
     role: { type: DataTypes.STRING, allowNull: false },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
   },
-  { sequelize, modelName: "user" }
+  { sequelize, modelName: "Users", timestamps: false,} // If you don't have createdAt/updatedAt columns 
 );
 
-export default User;
+export default Users;

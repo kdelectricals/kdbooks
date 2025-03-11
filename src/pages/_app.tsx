@@ -1,38 +1,21 @@
-import { AppProps } from "next/app";
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
-import { useEffect } from "react";
-import { signOut } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { getSession } from "next-auth/react";
 
-const theme = createTheme({
-  palette: {
-    primary: { main: "#1976d2" },
-    secondary: { main: "#dc004e" },
-  },
-});
+export default function App({ Component, pageProps }) {
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
-export default function MyApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
-    let timer = setTimeout(() => signOut(), 30 * 60 * 1000); // 30 mins
+    getSession().then((session) => {
+      if (!session && router.pathname !== "/login") {
+        router.push("/login");
+      }
+      setLoading(false);
+    });
+  }, [router]);
 
-    const resetTimer = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => signOut(), 30 * 60 * 1000);
-    };
+  if (loading) return <p>Loading...</p>;
 
-    window.addEventListener("mousemove", resetTimer);
-    window.addEventListener("keydown", resetTimer);
-
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("mousemove", resetTimer);
-      window.removeEventListener("keydown", resetTimer);
-    };
-  }, []);
-
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Component {...pageProps} />
-    </ThemeProvider>
-  );
+  return <Component {...pageProps} />;
 }

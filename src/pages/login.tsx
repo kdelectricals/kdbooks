@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { TextField, Button, Box, Container, Typography, Paper } from "@mui/material";
+import { deleteCookie } from "cookies-next";
 
 export default function Login() {
   const [email, setEmail] = useState("");
