@@ -12,11 +12,11 @@ export const getInvoiceWithItems = async (invoiceID: number) => {
     }
 
     const invoice = await Invoice.findOne({
-      where: { InvoiceID: invoiceID }, // Ensure correct case
+      where: { InvoiceID: invoiceID },
       include: [
         {
           model: Item,
-          as: "Items", // Ensure alias matches model association
+          as: "Items",
         },
       ],
     });
@@ -33,7 +33,7 @@ export const getInvoiceWithItems = async (invoiceID: number) => {
 };
 
 /**
- * Create a new invoice with its items.
+ * Create a new invoice with all its details.
  */
 export const createInvoiceWithItems = async (invoiceData: any) => {
   const transaction = await sequelize.transaction();
@@ -51,25 +51,30 @@ export const createInvoiceWithItems = async (invoiceData: any) => {
         InvoiceNo,
         InvoiceDate,
         CustomerID,
-        Reference
+        Reference,
+        Total, // Ensure total is stored in the invoice
       },
       { transaction }
     );
 
-    // Create invoice items
+    // Create invoice items with all relevant fields
     const invoiceItems = Items.map((item: any) => ({
       InvoiceID: newInvoice.InvoiceID,
       ItemName: item.ItemName,
       Quantity: item.Quantity,
+      Unit: item.Unit,
+      HSN: item.HSN,
       Rate: item.Rate,
-      CustomerID: item.CustomerID,
+      Discount: item.Discount,
+      DiscountedRate: item.DiscountedRate,
+      Total: item.Total, // Ensure total per item is stored
     }));
 
     await Item.bulkCreate(invoiceItems, { transaction });
 
     await transaction.commit(); // Commit transaction if successful
 
-    return { success: true, data: newInvoice };
+    return { success: true, data: { invoice: newInvoice, items: invoiceItems } };
   } catch (error) {
     await transaction.rollback(); // Rollback transaction on error
     console.error("Error creating invoice:", error);
