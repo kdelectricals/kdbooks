@@ -18,28 +18,27 @@ export default NextAuth({
         // Fetch user from MySQL database
         
           const user = await Users.findOne({ where: { username: credentials.email } });
-        
-
        
 
         if (!user || credentials.password !==user.dataValues.password) {
           throw new Error("Invalid email or password");
         }
 
-        return { id: user.id, email: user.email, role: user.role };
+        return { id: user.dataValues.id, email: user.dataValues.email, role: user.dataValues.role };
       },
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      session.user.role = token.role;
-      return session;
-    },
+
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role;
       }
       return token;
+    },
+    async session({ session, token }) {
+      if (session.user) session.user.role = token.role; // Add role to session
+      return session; 
     },
   },
   session: { strategy: "jwt", maxAge: 30 * 60 }, // 30 min expiration

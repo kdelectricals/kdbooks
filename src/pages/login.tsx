@@ -16,7 +16,6 @@ export default function Login() {
       email,
       password,
     });
-
     if (result?.error) {
       setError("Invalid email or password");
     } else {

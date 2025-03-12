@@ -24,7 +24,7 @@ export default function Dashboard() {
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
       <Typography variant="h4" fontWeight="bold" textAlign="center" gutterBottom>
-        Dashboard
+        Welcome to KD Dashboard
       </Typography>
       <Grid container spacing={3}>
         {dashboardItems.map((item, index) => (

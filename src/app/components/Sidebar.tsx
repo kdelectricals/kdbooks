@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Divider, Tooltip } from "@mui/material";
 import { Home, Receipt, People, Settings, Menu, Logout } from "@mui/icons-material";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const menuItems = [
@@ -23,6 +23,7 @@ export default function Sidebar() {
     router.push("/login"); 
   }
 
+
   return (
     <Drawer
       variant="permanent"
@@ -40,9 +41,12 @@ export default function Sidebar() {
       {/* Sidebar Header */}
       <div style={{ display: "flex", justifyContent: open ? "space-between" : "center", padding: "10px", alignItems: "center" }}>
         {open && <h3 style={{ margin: 0 }}>KD Electricals</h3>}
+      
         <IconButton onClick={() => setOpen(!open)} sx={{ color: "white" }}>
+          
           <Menu />
         </IconButton>
+        
       </div>
 
       <Divider sx={{ backgroundColor: "#374151" }} />
@@ -75,7 +79,7 @@ export default function Sidebar() {
               <Logout />
              
             </ListItemIcon>
-            {open && <ListItemText sx={{ color: "white" }} primary="Logout" />}
+            {open && <ListItemText sx={{ color: "white" }} primary="Logout"/>}
           
           </ListItemButton>
 

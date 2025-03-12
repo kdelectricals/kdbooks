@@ -14,7 +14,11 @@ Users.init(
     password: { type: DataTypes.STRING, allowNull: false },
     firstName: { type: DataTypes.STRING, allowNull: false },
     lastName: { type: DataTypes.STRING, allowNull: false },
-    role: { type: DataTypes.STRING, allowNull: false },
+    role: { 
+      type: DataTypes.ENUM("admin", "manager", "user"), // Define roles
+      allowNull: false,
+      defaultValue: "user",
+    },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
   },
   { sequelize, modelName: "Users", timestamps: false,} // If you don't have createdAt/updatedAt columns 
