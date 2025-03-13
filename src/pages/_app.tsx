@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
+import { SessionProvider } from "next-auth/react";
 
 export default function App({ Component, pageProps }) {
   const [loading, setLoading] = useState(true);
@@ -17,5 +18,9 @@ export default function App({ Component, pageProps }) {
 
   if (loading) return <p>Loading...</p>;
 
-  return <Component {...pageProps} />;
+  return (
+    <SessionProvider session={pageProps.session}>
+      <Component {...pageProps} />
+    </SessionProvider>
+  );
 }

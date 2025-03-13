@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { Profiler, useState } from "react";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Divider, Tooltip } from "@mui/material";
-import { Home, Receipt, People, Settings, Menu, Logout } from "@mui/icons-material";
+import { Home, Receipt, People, Settings, Menu, Logout, AccountBox, EventNote } from "@mui/icons-material";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
+
 const menuItems = [
   { text: "Dashboard", icon: <Home />, path: "/" },
   { text: "Invoices", icon: <Receipt />, path: "/invoices" },
+  { text: "To-Do List", icon: <EventNote />, path: "/todo" },
   { text: "Customers", icon: <People />, path: "/customers" },
   { text: "Settings", icon: <Settings />, path: "/settings" },
+  { text: "Account", icon: <AccountBox />, path: "/account" },
+  
 ];
 
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
   const router = useRouter(); 
+  const { data: session, status } = useSession();
 
   const handleLogout = async () =>{
     await signOut({ redirect: false });
@@ -40,7 +45,7 @@ export default function Sidebar() {
     >
       {/* Sidebar Header */}
       <div style={{ display: "flex", justifyContent: open ? "space-between" : "center", padding: "10px", alignItems: "center" }}>
-        {open && <h3 style={{ margin: 0 }}>KD Electricals</h3>}
+        {open && <h4 style={{ margin: 0 }}>KD Electricals <div>Welcome {session?.user.firstName}</div></h4>}
       
         <IconButton onClick={() => setOpen(!open)} sx={{ color: "white" }}>
           
@@ -73,18 +78,15 @@ export default function Sidebar() {
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={handleLogout} sx={{ "&:hover": { backgroundColor: "#374151" } }}>
-       
             <ListItemIcon sx={{ color: "white" }}>
-          
               <Logout />
-             
             </ListItemIcon>
             {open && <ListItemText sx={{ color: "white" }} primary="Logout"/>}
-          
           </ListItemButton>
 
         </ListItem>
       </List>
+      
     </Drawer>
   );
 }

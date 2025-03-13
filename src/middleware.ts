@@ -12,7 +12,6 @@ export async function middleware(req: NextRequest) {
   if (!sessionToken) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-
   const { pathname } = req.nextUrl;
 
   const userUnauthorizedRoutes = ["/invoices"];
@@ -27,5 +26,5 @@ export async function middleware(req: NextRequest) {
 
 // Apply middleware to all routes
 export const config = {
-  matcher: ["/", "/invoices", "/customers", "/settings", "/unauthorized"],
+  matcher: ["/", "/invoices", "/customers", "/settings", "/unauthorized", "/account"],
 };
