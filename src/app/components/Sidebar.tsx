@@ -22,7 +22,7 @@ export default function Sidebar() {
   const [open, setOpen] = useState(true);
   const router = useRouter(); 
   const { data: session, status } = useSession();
-
+  
   const handleLogout = async () =>{
     await signOut({ redirect: false });
     router.push("/login"); 

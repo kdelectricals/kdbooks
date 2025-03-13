@@ -1,56 +1,33 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import sequelize from "../config";
-import User from "./User";
-
-interface Task {
-  id: string;
-  text: string;
-  completed: boolean;
-}
+import Task from "./Task";
 
 interface ToDoListAttributes {
-  id: string;
-  userId: string;
+  id: number;
+  user_id: number;
   date: string;
-  tasks: Task[];
 }
 
 interface ToDoListCreationAttributes extends Optional<ToDoListAttributes, "id"> {}
 
 class ToDoList extends Model<ToDoListAttributes, ToDoListCreationAttributes> implements ToDoListAttributes {
-  public id!: string;
-  public userId!: string;
+  public id!: number;
+  public user_id!: number;
   public date!: string;
-  public tasks!: Task[];
+  tasks: any;
 }
 
 ToDoList.init(
   {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
-    userId: {
-      type: DataTypes.UUID,
-      allowNull: false,
-    },
-    date: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    tasks: {
-      type: DataTypes.JSON,
-      allowNull: false,
-    },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    user_id: { type: DataTypes.INTEGER, allowNull: false },
+    date: { type: DataTypes.STRING, allowNull: false, unique: true },
   },
-  {
-    sequelize,
-    modelName: "ToDoList",
-  }
+  { sequelize, modelName: "to_do_lists", timestamps: false, }
 );
 
-// Establish relationship
-ToDoList.belongsTo(User, { foreignKey: "userId" });
+// Association with Task model
+ToDoList.hasMany(Task, { foreignKey: "to_do_list_id", onDelete: "CASCADE" });
+Task.belongsTo(ToDoList, { foreignKey: "to_do_list_id" });
 
 export default ToDoList;

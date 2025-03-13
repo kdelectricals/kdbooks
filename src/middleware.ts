@@ -26,5 +26,5 @@ export async function middleware(req: NextRequest) {
 
 // Apply middleware to all routes
 export const config = {
-  matcher: ["/", "/invoices", "/customers", "/settings", "/unauthorized", "/account"],
+  matcher: ["/", "/invoices", "/customers", "/settings", "/unauthorized", "/account", "/todo"],
 };

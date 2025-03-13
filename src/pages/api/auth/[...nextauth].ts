@@ -17,13 +17,13 @@ const authOptions: NextAuthOptions = {
 
         // Fetch user from MySQL database
         const user = await Users.findOne({ where: { username: credentials.email } });
-
+        console.log(user?.dataValues)
         if (!user || credentials.password !== user.dataValues.password) {
           throw new Error("Invalid email or password");
         }
 
         return {
-          id: String(user.dataValues.id),
+          id: String(user.dataValues.UserID),
           email: user.dataValues.email,
           firstName: user.dataValues.firstName,
           lastName: user.dataValues.lastName,
