@@ -163,7 +163,7 @@ export default function CreateInvoice() {
       setInvoiceId(data.invoice.id);
     } catch (error) {
       console.error("❌ Error creating invoice:", error);
-      alert(error.message);
+      alert(error?.message);
     }
   };
 

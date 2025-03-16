@@ -1,7 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config";
+import Quotation from "./Quotation";
+import Recording from "./Recording";
+import Users from "./User";
 
-class Customer extends Model {}
+class Customer extends Model {
+  [x: string]: null;
+}
 
 Customer.init(
   {
@@ -10,11 +15,11 @@ Customer.init(
       autoIncrement: true, 
       primaryKey: true 
     },
-    firstName: { 
+    first_name: { 
       type: DataTypes.STRING, 
       allowNull: false 
     },
-    lastName: { 
+    last_name: { 
       type: DataTypes.STRING, 
       allowNull: false 
     },
@@ -27,13 +32,33 @@ Customer.init(
       allowNull: false, 
       unique: true 
     },
-    companyName: { 
+    company_name: { 
       type: DataTypes.STRING, 
       allowNull: true 
     },
     address: { 
       type: DataTypes.STRING, 
       allowNull: true 
+    },
+    requirement: { 
+      type: DataTypes.STRING, 
+      allowNull: true 
+    },
+    remark: { 
+      type: DataTypes.STRING, 
+      allowNull: true 
+    },
+    follow_up_date: { 
+      type: DataTypes.DATE, 
+      allowNull: true 
+    },
+    status: { 
+      type: DataTypes.ENUM('NotCompleted','Pending','Completed'), 
+      allowNull: true 
+    },
+    user_id: { 
+      type: DataTypes.INTEGER, 
+      allowNull: false 
     },
   },
   { 
@@ -44,4 +69,12 @@ Customer.init(
   }
 );
 
+// / Define relations÷hips
+Customer.hasMany(Quotation, { foreignKey: "customer_id", as: "quotations" });
+Customer.hasMany(Recording, { foreignKey: "CustomerID", as: "recordings" });
+
+(async () => {
+  const Users = (await import("./User")).default;
+  Customer.belongsTo(Users, { foreignKey: "user_id", as: "users" });
+})();
 export default Customer;

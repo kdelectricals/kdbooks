@@ -1,5 +1,6 @@
 import { DataTypes, Model } from "sequelize";
 import sequelize from "../config";
+import Customer from "./Customer";
 
 class Users extends Model {
   email: string | null | undefined;
@@ -23,5 +24,8 @@ Users.init(
   },
   { sequelize, modelName: "Users", timestamps: false,} // If you don't have createdAt/updatedAt columns 
 );
+
+Users.hasMany(Customer, { foreignKey: "user_id", as: "customers" });
+
 
 export default Users;
