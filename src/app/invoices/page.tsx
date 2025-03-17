@@ -20,7 +20,14 @@ import {
 import { AddCircle, Delete } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
-
+type Item = {
+  name: string;
+  quantity: number;
+  rate: number;
+  discount: number;
+  discountedRate: number;
+  total: number;
+};
 export default function CreateInvoice() {
   type Customer = {
     customerID: any;
@@ -94,22 +101,30 @@ export default function CreateInvoice() {
   };
   
 
-  const handleItemChange = (index: number, field: keyof Item, value: any) => {
+  const handleItemChange = <K extends keyof Item>(
+    index: number,
+    field: K,
+    value: Item[K] // ✅ Ensures value matches the expected type
+  ) => {
     const newItems = [...items];
     newItems[index][field] = value;
-
+  
+    // ✅ Ensure calculations only run for numeric fields
     if (field === "quantity" || field === "rate" || field === "discount") {
-      const rate = newItems[index].rate;
-      const discount = newItems[index].discount;
+      const rate = newItems[index].rate || 0;
+      const discount = newItems[index].discount || 0;
+      const quantity = newItems[index].quantity || 0;
+  
       const discountedRate = rate - (rate * discount) / 100;
-      const quantity = newItems[index].quantity;
-
+      const total = quantity * discountedRate;
+  
       newItems[index].discountedRate = discountedRate;
-      newItems[index].total = quantity * discountedRate;
+      newItems[index].total = total;
     }
-
+  
     setItems(newItems);
   };
+  
 
   const subTotal = items.reduce((sum, item) => sum + item.total, 0);
   const cgstAmount = (subTotal * cgst) / 100;
@@ -163,7 +178,10 @@ export default function CreateInvoice() {
       setInvoiceId(data.invoice.id);
     } catch (error) {
       console.error("❌ Error creating invoice:", error);
-      alert(error?.message);
+      if(error instanceof Error){
+        alert(error.message);
+      }
+     
     }
   };
 
