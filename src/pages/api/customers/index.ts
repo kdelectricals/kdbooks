@@ -4,6 +4,7 @@ import Quotation from "../../../../database/models/Quotation";
 import Recording from "../../../../database/models/Recording";
 import Users from "../../../../database/models/User";
 import { Op } from "sequelize";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
@@ -58,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: "First Name and Contact are required!" });
       }
 
-      const newCustomer = await Customer.create({
+      const newCustomer:any = await Customer.create({
         first_name,
         last_name,
         email,
@@ -77,7 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         await Promise.all(
           quotations.map(async (quotationDetails) => {
             await Quotation.create({
-              CustomerID: newCustomer.customerID,
+              CustomerID: newCustomer?.customerID,
               QuotationDetails: quotationDetails,
             });
           })

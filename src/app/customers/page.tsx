@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useEffect, useState, useRef } from "react";
 import {
@@ -19,7 +20,6 @@ import {
   MenuItem,
   Snackbar,
   Alert,
-  Grid,
 } from "@mui/material";
 import { styled } from "@mui/system";
 import {
@@ -27,9 +27,7 @@ import {
   AddCircle,
   ArrowBack,
   ArrowForward,
-  MarkunreadOutlined,
   Person,
-  PersonOutline,
   Business,
   Assignment,
   Comment,
@@ -82,7 +80,7 @@ export default function CustomersPage() {
     field: keyof Customer;
   } | null>(null);
   const [editedValue, setEditedValue] = useState<string>("");
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchInput, setSearchInput] = useState<string>(""); 
@@ -94,14 +92,14 @@ export default function CustomersPage() {
 
   const newCustomerRef = useRef<HTMLTableRowElement | null>(null);
   // Filters for searching
-  const [search, setSearch] = useState<{ [key: string]: string }>({
-    first_name: "",
-    last_name: "",
-    email: "",
-    contact: "",
-    address: "",
-    company_name: "",
-  });
+  // const [search, setSearch] = useState<{ [key: string]: string }>({
+  //   first_name: "",
+  //   last_name: "",
+  //   email: "",
+  //   contact: "",
+  //   address: "",
+  //   company_name: "",
+  // });
 
    // Debounce effect for search
    useEffect(() => {

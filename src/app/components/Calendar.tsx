@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { useState, useEffect } from "react";
 import FullCalendar from "@fullcalendar/react";
@@ -6,7 +7,6 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import {
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   TextField,
@@ -38,13 +38,12 @@ export default function CalendarComponent() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [taskText, setTaskText] = useState<string>("");
   const [open, setOpen] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
-  useEffect(() => {
-    fetchToDoLists();
-  }, []);
+
 
   const fetchToDoLists = async () => {
+    if (!session?.user?.id) return;
     try {
       const response = await axios.get(
         `/api/todo/get?user_id=${session?.user?.id}`
@@ -70,6 +69,10 @@ export default function CalendarComponent() {
       console.error("Error fetching to-do lists", error);
     }
   };
+
+  useEffect(() => {
+    fetchToDoLists();
+  }, [fetchToDoLists]); // Runs when fetchToDoLists changes
   const handleSelect = (arg: { startStr: string }) => {
     setSelectedDate(arg.startStr);
     setOpen(true);
@@ -78,7 +81,7 @@ export default function CalendarComponent() {
   const handleAddTask = async () => {
     if (selectedDate && taskText.trim()) {
       try {
-        const response = await axios.post("/api/todo/create", {
+         await axios.post("/api/todo/create", {
           user_id: session?.user.id,
           date: selectedDate,
           tasks: [{ text: taskText }],

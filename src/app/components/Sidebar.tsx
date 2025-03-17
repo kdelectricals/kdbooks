@@ -1,6 +1,6 @@
 "use client";
 
-import { Profiler, useState } from "react";
+import {  useState } from "react";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Divider, Tooltip } from "@mui/material";
 import { Home, Receipt, People, Settings, Menu, Logout, AccountBox, EventNote } from "@mui/icons-material";
 import Link from "next/link";
@@ -21,7 +21,7 @@ const menuItems = [
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
   const router = useRouter(); 
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   
   const handleLogout = async () =>{
     await signOut({ redirect: false });

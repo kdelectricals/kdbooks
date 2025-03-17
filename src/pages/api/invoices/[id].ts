@@ -10,7 +10,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     await sequelize.authenticate();
 
     const { id } = req.query;
-
+    if (typeof id !== "string") {
+      return res.status(400).json({ error: "Invalid invoice ID" });
+    }
     if (req.method === "GET") {
       // Fetch invoice with all associated items
       const invoice = await Invoice.findByPk(id, {
@@ -30,6 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } catch (error) {
     console.error("API Error:", error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+    const err = error as Error;
+    return res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 }

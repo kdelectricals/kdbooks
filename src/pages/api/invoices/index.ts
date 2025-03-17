@@ -3,6 +3,7 @@ import Invoice from "../../../../database/models/Invoice";
 import Item from "../../../../database/models/Item";
 import sequelize from "../../../../database/config";
 import syncDatabase from "../../../../database/index";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
@@ -31,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const transaction = await sequelize.transaction();
       try {
         // ✅ Create new Invoice
-        const invoice = await Invoice.create(
+        const invoice:any = await Invoice.create(
           { 
             InvoiceNo: invoiceNo, 
             Reference: reference || "", 
@@ -66,7 +67,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       } catch (error) {
         await transaction.rollback(); // Rollback on failure
         console.error("❌ Error Creating Invoice:", error);
-        return res.status(500).json({ error: "Failed to create invoice", details: error.message });
+        const err = error as Error;
+        return res.status(500).json({ error: "Failed to create invoice", details: err.message });
       }
     } 
     
@@ -76,6 +78,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } catch (error) {
     console.error("❌ API Error:", error);
-    return res.status(500).json({ error: "Internal Server Error", details: error.message });
+    const err = error as Error;
+    return res.status(500).json({ error: "Internal Server Error", details: err.message });
   }
 }

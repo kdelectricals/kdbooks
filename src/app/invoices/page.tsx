@@ -1,5 +1,5 @@
 "use client";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from "react";
 import {
   Autocomplete,
@@ -17,17 +17,9 @@ import {
   Grid,
   TableContainer
 } from "@mui/material";
-import { AddCircle, Delete } from "@mui/icons-material";
+import {  Delete } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
-type Item = {
-  name: string;
-  quantity: number;
-  rate: number;
-  discount: number;
-  discountedRate: number;
-  total: number;
-};
 export default function CreateInvoice() {
   type Customer = {
     customerID: any;
@@ -70,6 +62,10 @@ export default function CreateInvoice() {
       .then((res) => res.json())
       .then((data: Customer[]) => setCustomers(data))
       .catch((err) => console.error("Error fetching customers:", err));
+      setCgst(9);
+      setSgst(9) ;
+      setIgst(0);
+      setReference("");
   }, []);
 
   const handleCustomerChange = (event: any, newValue: Customer | null) => {
@@ -96,9 +92,9 @@ export default function CreateInvoice() {
     setOpenPreview(true);
   };
   
-  const handlePreviewClose = () => {
-    setOpenPreview(false);
-  };
+  // const handlePreviewClose = () => {
+  //   setOpenPreview(false);
+  // };
   
 
   const handleItemChange = <K extends keyof Item>(

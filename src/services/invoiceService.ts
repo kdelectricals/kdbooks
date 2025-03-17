@@ -1,7 +1,7 @@
 import Invoice from "../../database/models/Invoice";
 import Item from "../../database/models/Item";
 import sequelize from "../../database/config";
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Fetch an invoice with all its items.
  */
@@ -26,9 +26,10 @@ export const getInvoiceWithItems = async (invoiceID: number) => {
     }
 
     return { success: true, data: invoice };
-  } catch (error:any) {
+  } catch (error) {
     console.error("Error fetching invoice:", error);
-    return { error: error.message || "Internal Server Error", status: 500 };
+    const err = error as Error;
+    return { error: err.message || "Internal Server Error", status: 500 };
   }
 };
 

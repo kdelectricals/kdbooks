@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { signIn } from "next-auth/react";
 import { TextField, Button, Box, Container, Typography, Paper, Grid } from "@mui/material";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export default function Login() {
   const [email, setEmail] = useState("");
