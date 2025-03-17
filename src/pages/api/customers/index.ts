@@ -3,14 +3,29 @@ import Customer from "../../../../database/models/Customer";
 import Quotation from "../../../../database/models/Quotation";
 import Recording from "../../../../database/models/Recording";
 import Users from "../../../../database/models/User";
+import { Op } from "sequelize";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === "GET") {
     try {
       const pageNumber = parseInt(req.query.page as string) || 1;
       const pageSize = parseInt(req.query.limit as string) || 10;
+      const searchQuery = req.query.search as string || "";
   
       const { count, rows: customers } = await Customer.findAndCountAll({
+        where: {
+          [Op.or]: [
+            { first_name: { [Op.like]: `%${searchQuery}%` } },
+            { last_name: { [Op.like]: `%${searchQuery}%` } },
+            { email: { [Op.like]: `%${searchQuery}%` } },
+            { contact: { [Op.like]: `%${searchQuery}%` } },
+            { address: { [Op.like]: `%${searchQuery}%` } },
+            { company_name: { [Op.like]: `%${searchQuery}%` } },
+            { requirement: { [Op.like]: `%${searchQuery}%` } },
+            { remark: { [Op.like]: `%${searchQuery}%` } },
+            { follow_up_date: { [Op.like]: `%${searchQuery}%` } }, 
+            { status: { [Op.like]: `%${searchQuery}%` } },        ],
+        },
         order: [["customerID", "DESC"]],
         offset: (pageNumber - 1) * pageSize,
         limit: pageSize,

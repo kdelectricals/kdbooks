@@ -22,7 +22,13 @@ import {
   Grid,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import { Save, AddCircle, ArrowBack, ArrowForward, MarkunreadOutlined,   Person,
+import {
+  Save,
+  AddCircle,
+  ArrowBack,
+  ArrowForward,
+  MarkunreadOutlined,
+  Person,
   PersonOutline,
   Business,
   Assignment,
@@ -34,8 +40,9 @@ import { Save, AddCircle, ArrowBack, ArrowForward, MarkunreadOutlined,   Person,
   Email,
   Mic,
   Phone,
-  Home, 
-  AttachFileOutlined, } from "@mui/icons-material";
+  Home,
+  AttachFileOutlined,
+} from "@mui/icons-material";
 import { useSession } from "next-auth/react";
 
 interface Customer {
@@ -55,7 +62,6 @@ const StyledTableContainer = styled(Paper)({
   boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
   margin: "0 0", // Center the table
   maxWidth: "auto", // Make the table more comfortable
-  
 });
 
 const StyledTableRow = styled(TableRow)({
@@ -63,6 +69,8 @@ const StyledTableRow = styled(TableRow)({
     backgroundColor: "#f5f5f5",
   },
 });
+
+const DEBOUNCE_DELAY = 200;
 
 export default function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -76,6 +84,8 @@ export default function CustomersPage() {
   const [editedValue, setEditedValue] = useState<string>("");
   const { data: session, status } = useSession();
   const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchInput, setSearchInput] = useState<string>(""); 
 
   // Pagination
   const [page, setPage] = useState<number>(1);
@@ -83,13 +93,31 @@ export default function CustomersPage() {
   const [totalPages, setTotalPages] = useState<number>(1);
 
   const newCustomerRef = useRef<HTMLTableRowElement | null>(null);
+  // Filters for searching
+  const [search, setSearch] = useState<{ [key: string]: string }>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    contact: "",
+    address: "",
+    company_name: "",
+  });
+
+   // Debounce effect for search
+   useEffect(() => {
+    const handler = setTimeout(() => {
+      setSearchQuery(searchInput); // Update query after delay
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(handler); // Cleanup on new input
+  }, [searchInput]);
 
   useEffect(() => {
     async function fetchCustomers() {
       setLoading(true);
       try {
         const response = await fetch(
-          `/api/customers?page=${page}&limit=${limit}`
+          `/api/customers?page=${page}&limit=${limit}&search=${searchQuery}`
         );
         if (!response.ok) throw new Error("Failed to fetch customers");
         const data = await response.json();
@@ -103,7 +131,7 @@ export default function CustomersPage() {
       }
     }
     fetchCustomers();
-  }, [page, limit]);
+  }, [page, limit, searchQuery]);
 
   // Close new customer section if clicking outside
   useEffect(() => {
@@ -194,15 +222,44 @@ export default function CustomersPage() {
   const getStatusStyles = (status: string) => {
     switch (status) {
       case "Completed":
-        return { backgroundColor: "#d4edda", color: "#155724", circleColor: "#28a745" };
+        return {
+          backgroundColor: "#d4edda",
+          color: "#155724",
+          circleColor: "#28a745",
+        };
       case "Pending":
-        return { backgroundColor: "#fff3cd", color: "#856404", circleColor: "#ffc107" };
+        return {
+          backgroundColor: "#fff3cd",
+          color: "#856404",
+          circleColor: "#ffc107",
+        };
       case "NotCompleted":
-        return { backgroundColor: "#f8d7da", color: "#721c24", circleColor: "#dc3545" };
+        return {
+          backgroundColor: "#f8d7da",
+          color: "#721c24",
+          circleColor: "#dc3545",
+        };
       default:
-        return { backgroundColor: "transparent", color: "inherit", circleColor: "transparent" };
+        return {
+          backgroundColor: "transparent",
+          color: "inherit",
+          circleColor: "transparent",
+        };
     }
   };
+
+  // const handleFilterChange = (field: string, value: string) => {
+  //   setFilters((prev) => ({ ...prev, [field]: value.toLowerCase() }));
+  // };
+
+  // // Apply filters to customer list
+  // const filteredCustomers = customers.filter((customer) =>
+  //   Object.keys(filters).every((key) =>
+  //     (customer[key as keyof Customer] || "")
+  //       .toLocaleString()
+  //       .includes(filters[key as keyof typeof filters])
+  //   )
+  // );
 
   return (
     <Container maxWidth="lg" sx={{ mt: 2 }}>
@@ -212,7 +269,6 @@ export default function CustomersPage() {
         alignItems="center"
         mb={3}
         paddingInline={7}
-        
       >
         <Typography variant="h5" fontWeight="">
           Customers List
@@ -230,98 +286,181 @@ export default function CustomersPage() {
         <Table>
           <TableHead>
             <TableRow sx={{ backgroundColor: "#f9fa9f" }}>
+              <TableCell sx={{ fontWeight: "bold" }}>
+                <Box display="flex" alignItems="center">
+                  <FormatListNumberedOutlined sx={{ mr: 1 }} />
+                  Number
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px" alignSelf="start">
+                  <Person sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="First Name"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px" >
+                  <Person sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Last Name"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
 
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center"width="150px">
+                  <Email sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Email"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <Phone sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Contact"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <Home sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Address"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center">
+                  <Business sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Company"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <Assignment sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Requirement"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center">
+                  <Comment sx={{ mr: 1 }} />
+                  <TextField
+                    id="filled-textarea"
+                    label="Remark"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <Event sx={{ mr: 1 }} />
 
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <FormatListNumberedOutlined sx={{ mr: 1 }} />
-    Number
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Person sx={{ mr: 1 }} />
-    First Name
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Person sx={{ mr: 1 }} />
-    Last Name
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Email sx={{ mr: 1 }} />
-    Email
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Phone sx={{ mr: 1 }} />
-    Contact
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Home sx={{ mr: 1 }} />
-    Address
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Business sx={{ mr: 1 }} />
-    Company
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Assignment sx={{ mr: 1 }} />
-    Requirement
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Comment sx={{ mr: 1 }} />
-    Remark
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Event sx={{ mr: 1 }} />
-    FollowUpDate
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <SupervisorAccount sx={{ mr: 1 }} />
-    Handle By
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <CheckCircle sx={{ mr: 1 }} />
-    Status
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <AttachFileOutlined sx={{ mr: 1 }} />
-    Qtn
-  </Box>
-</TableCell>
-<TableCell sx={{ fontWeight: "bold" }}>
-  <Box display="flex" alignItems="center">
-    <Mic sx={{ mr: 1 }} />
-    Recording
-  </Box>
-</TableCell>
+                  <TextField
+                    id="filled-textarea"
+                    label="FollowUpDate"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <SupervisorAccount sx={{ mr: 1 }} />
+                  Handle By
+         
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <CheckCircle sx={{ mr: 1 }} />
+
+                  <TextField
+                    id="filled-textarea"
+                    label="Status"
+                    placeholder="Search"
+                    multiline
+                    variant="filled"
+                    size="small"
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <AttachFileOutlined sx={{ mr: 1 }} />
+                  Qtn
+                </Box>
+              </TableCell>
+              <TableCell sx={{ paddingLeft: "0px" }}>
+                <Box display="flex" alignItems="center" width="150px">
+                  <Mic sx={{ mr: 1 }} />
+                  Recording
+                </Box>
+              </TableCell>
             </TableRow>
+            <TableRow></TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={14} align="center">
+                <TableCell colSpan={14} align="center" >
                   <CircularProgress />
                 </TableCell>
               </TableRow>
@@ -400,11 +539,14 @@ export default function CustomersPage() {
                             String(customer[field as keyof Customer] ?? "")
                           )
                         }
-                        sx={{ minWidth: 150, padding: "8px", backgroundColor:
-                          field === "status"
-                            ? getStatusStyles (customer?.status ?? "")
-                            : "inherit",
-                           }}
+                        sx={{
+                          minWidth: 150,
+                          padding: "8px",
+                          backgroundColor:
+                            field === "status"
+                              ? getStatusStyles(customer?.status ?? "")
+                              : "inherit",
+                        }}
                       >
                         {editing?.id === customer.customerID &&
                         editing?.field === field ? (
@@ -425,11 +567,11 @@ export default function CustomersPage() {
                         ) : (
                           <span>
                             <>
-                            {field === "contct" && (<>{customer.contact}</>)}
-                            {field === "Handle By"
-                              ? customer.users?.FirstName
-                              : (customer as any)[field]}</>
-                            
+                              {field === "contct" && <>{customer.contact}</>}
+                              {field === "Handle By"
+                                ? customer.users?.FirstName
+                                : (customer as any)[field]}
+                            </>
                           </span>
                         )}
                       </TableCell>
