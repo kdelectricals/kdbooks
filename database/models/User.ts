@@ -5,7 +5,7 @@ import Customer from "./Customer";
 class Users extends Model {
   email: string | null | undefined;
   role: unknown;
-  id: string;
+
 }
 
 Users.init(
