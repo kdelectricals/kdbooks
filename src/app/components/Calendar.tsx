@@ -116,28 +116,69 @@ export default function CalendarComponent() {
   const handleCloseDialog = () => {
     setOpen(false);
   };
+  const specialDays = [
+    { title: "KD Eletricals 3rd anniversary ", date: "2025-03-15", color: "#f00" },
+    // International Special Days
+    { title: "New Year's Day", date: "2025-01-01", color: "#f00" },
+    { title: "Valentine's Day", date: "2025-02-14", color: "#f00" },
+    { title: "International Women's Day", date: "2025-03-08", color: "#f00" },
+    { title: "Earth Day", date: "2025-04-22", color: "#f00" },
+    { title: "World Environment Day", date: "2025-06-05", color: "#f00" },
+    { title: "International Yoga Day", date: "2025-06-21", color: "#f00" },
+    { title: "Friendship Day", date: "2025-08-03", color: "#f00" }, // First Sunday of August
+    { title: "World Literacy Day", date: "2025-09-08", color: "#f00" },
+    { title: "World Food Day", date: "2025-10-16", color: "#f00" },
+    { title: "Children's Day (Universal)", date: "2025-11-20", color: "#f00" },
+    { title: "Christmas", date: "2025-12-25", color: "#f00" },
+  
+    // Indian Special Days
+    { title: "Republic Day (India)", date: "2025-01-26", color: "#f00" },
+    { title: "Holi", date: "2025-03-14", color: "#f00" }, // Varies each year
+    { title: "Ram Navami", date: "2025-04-06", color: "#f00" }, // Varies each year
+    { title: "Mahavir Jayanti", date: "2025-04-10", color: "#f00" }, // Varies each year
+    { title: "Good Friday", date: "2025-04-18", color: "#f00" }, // Varies each year
+    { title: "Eid al-Fitr", date: "2025-03-31", color: "#f00" }, // Varies each year
+    { title: "Independence Day (India)", date: "2025-08-15", color: "#f00" },
+    { title: "Raksha Bandhan", date: "2025-08-09", color: "#f00" }, // Varies each year
+    { title: "Ganesh Chaturthi", date: "2025-08-27", color: "#f00" }, // Varies each year
+    { title: "Gandhi Jayanti / Dussehra", date: "2025-10-02", color: "#f00" },
 
-  const events = Object.values(toDoLists)
-    .filter((list) => list.tasks.length > 0) // Only include dates that have tasks
-    .map((list) => {
-      const totalTasks = list.tasks.length;
-      const completedTasks = list.tasks.filter((task) => task.completed).length;
+    { title: "Diwali", date: "2025-10-21", color: "#f00" }, // Varies each year
+    { title: "Guru Nanak Jayanti", date: "2025-11-15", color: "#f00" }, // Varies each year
+  
+    // Maharashtra Special Days
+    { title: "Maharashtra Day / Labour Day", date: "2025-05-01", color: "#f00" },
+    { title: "Gudi Padwa", date: "2025-03-30", color: "#f00" }, // Marathi New Year, varies each year
+    { title: "Shivaji Maharaj Jayanti", date: "2025-02-19", color: "#f00" },
+    { title: "Ambedkar Jayanti", date: "2025-04-14", color: "#f00" },
+    { title: "Ashadhi Ekadashi", date: "2025-07-07", color: "#f00" }, // Pandharpur Wari festival, varies each year
+    { title: "Guru Purnima", date: "2025-07-11", color: "#f00" }, // Varies each year
+    { title: "Dahi Handi (Janmashtami)", date: "2025-08-16", color: "#f00" }, // Celebrated across Maharashtra
+    { title: "Ganesh Visarjan", date: "2025-09-06", color: "#f00" }, // End of Ganesh Chaturthi, varies each year
+    { title: "Navratri Begins / International Peace Day", date: "2025-09-21", color: "#f00" }, // First day of Navratri, varies each year
+    { title: "Lakshmi Pujan (Diwali)", date: "2025-10-20", color: "#f00" }, // Diwali special day in Maharashtra
+    { title: "Bhau Beej", date: "2025-10-23", color: "#f00" }, // Marathi version of Bhai Dooj
+  ];
+  
+  const events = [
+    ...Object.values(toDoLists).map((list) => ({
+      id: list.id.toString(),
+      title: "Tasks",
+      start: list.date,
+      backgroundColor:
+        list.tasks.every((task) => task.completed) ? "green" : "red",
+    })),
+    ...specialDays.map((day, index) => ({
+      id: `special-${index}`,
+      title: day.title,
+      start: day.date,
+      backgroundColor: day.color,
+      textColor: "white",
+      display: "background", // Makes it a full-day highlight
+    })),
+  ];
 
-      // Determine color based on completion status
-      let eventColor = "red"; // Default: No tasks completed
-      if (completedTasks > 0 && completedTasks < totalTasks) {
-        eventColor = "orange"; // Some tasks completed
-      } else if (completedTasks === totalTasks) {
-        eventColor = "green"; // All tasks completed
-      }
 
-      return {
-        id: list.id.toString(),
-        title: "Tasks",
-        start: list.date,
-        backgroundColor: eventColor,
-      };
-    });
 
   return (
     <div
@@ -180,31 +221,36 @@ export default function CalendarComponent() {
             arg.el.style.boxShadow = "none"; // Reset shadow
           });
         }}
-        eventContent={(eventInfo) => (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              backgroundColor: "black",
-              color: "white",
-              padding: "5px",
-              borderRadius: "4px",
-            }}
-          >
-            {/* Small colored circle */}
-            <span
+        eventContent={(eventInfo) => {
+          const isSpecialDay = specialDays.some((day) => day.title === eventInfo.event.title);
+          return (
+            <div
               style={{
-                width: "15px",
-                height: "15px",
-                backgroundColor: eventInfo.event.backgroundColor,
-                display: "inline-block",
-                marginRight: "5px",
-                borderRadius: "50%", // This makes it a circle!
+                display: "flex",
+                alignItems: "center",
+                backgroundColor: isSpecialDay ? eventInfo.event.backgroundColor : "black",
+                color: "white",
+                padding: "5px",
+                borderRadius: "4px",
+                fontWeight: isSpecialDay ? "bold" : "normal",
               }}
-            />
-            {eventInfo.event.title}
-          </div>
-        )}
+            >
+              <span
+                style={{
+                  width: "15px",
+                  height: "15px",
+                  backgroundColor: eventInfo.event.backgroundColor,
+                  display: "inline-block",
+                  marginRight: "5px",
+                  borderRadius: "50%",
+                }}
+              />
+              <span style={{fontSize: '12px'}} > {eventInfo.event.title}</span>
+             
+            </div>
+          );
+        }}
+        
       />
 
       <Dialog

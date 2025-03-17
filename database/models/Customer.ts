@@ -4,9 +4,7 @@ import Quotation from "./Quotation";
 import Recording from "./Recording";
 import Users from "./User";
 
-class Customer extends Model {
-  [x: string]: null;
-}
+class Customer extends Model {}
 
 Customer.init(
   {
