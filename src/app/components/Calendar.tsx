@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -42,13 +42,11 @@ export default function CalendarComponent() {
 
 
 
-  const fetchToDoLists = async () => {
-    if (!session?.user?.id) return;
+  const fetchToDoLists = useCallback(async () => {
     try {
-      const response = await axios.get(
-        `/api/todo/get?user_id=${session?.user?.id}`
-      );
+      if (!session?.user?.id) return; // Avoid calling API if user is not available
 
+      const response = await axios.get(`/api/todo/get?user_id=${session.user.id}`);
       const toDoLists = response.data.toDoLists;
 
       // Merge tasks by date
@@ -68,11 +66,15 @@ export default function CalendarComponent() {
     } catch (error) {
       console.error("Error fetching to-do lists", error);
     }
-  };
+  }, [session?.user?.id]); // ✅ Dependencies: function only changes when `session.user.id` changes
+
 
   useEffect(() => {
     fetchToDoLists();
   }, [fetchToDoLists]); // Runs when fetchToDoLists changes
+
+
+
   const handleSelect = (arg: { startStr: string }) => {
     setSelectedDate(arg.startStr);
     setOpen(true);
