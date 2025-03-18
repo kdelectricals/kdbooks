@@ -7,6 +7,7 @@ const sequelize = new Sequelize(
   {
     host: "streetfoodwala.in",
     dialect: "mysql",
+    dialectModule: require('mysql2'),
     logging: false, // Disable logging in production
   }
 );
