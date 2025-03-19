@@ -4,11 +4,15 @@ import type { NextRequest } from "next/server";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 export async function middleware(req: NextRequest) {
-  const sessionToken = req.cookies.get("next-auth.session-token")?.value;
+  const sessionToken =
+  req.cookies.get("next-auth.session-token")?.value ||
+  req.cookies.get("__Secure-next-auth.session-token")?.value;
+  console.log(sessionToken,' session token');
   const url = req.nextUrl;
 
   try {
     const token: any = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    console.log(token,'token');
 
     // Prevent infinite redirect loop by allowing access to login page
     if (url.pathname === "/login") {
