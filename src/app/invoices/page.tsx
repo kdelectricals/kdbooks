@@ -21,11 +21,11 @@ import {  Delete } from "@mui/icons-material";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 
 export default function CreateInvoice() {
-  type Customer = {
+  type Buyer = {
     customerID: any;
     id: number;
-    firstName: string;
-    lastName: string;
+    first_name: string;
+    last_name: string;
     contact: string;
     email: string;
     company?: string;
@@ -43,8 +43,8 @@ export default function CreateInvoice() {
     total: number;
   };
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<Buyer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Buyer | null>(null);
   const [items, setItems] = useState<Item[]>([
     { itemName: "", quantity: 1, unit: "", hsn: "", rate: 0, discount: 0, discountedRate: 0, total: 0 },
   ]);
@@ -58,9 +58,9 @@ export default function CreateInvoice() {
 
 
   useEffect(() => {
-    fetch("/api/customers")
+    fetch("/api/buyers")
       .then((res) => res.json())
-      .then((data: Customer[]) => setCustomers(data))
+      .then((data: Buyer[]) => setCustomers(data?.data))
       .catch((err) => console.error("Error fetching customers:", err));
       setCgst(9);
       setSgst(9) ;
@@ -68,7 +68,7 @@ export default function CreateInvoice() {
       setReference("");
   }, []);
 
-  const handleCustomerChange = (event: any, newValue: Customer | null) => {
+  const handleCustomerChange = (event: any, newValue: Buyer | null) => {
     setSelectedCustomer(newValue);
   };
 
@@ -215,7 +215,7 @@ export default function CreateInvoice() {
 
       <Autocomplete
         options={customers}
-        getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+        getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
         value={selectedCustomer}
         onChange={handleCustomerChange}
         renderInput={(params) => <TextField {...params} label="Select Customer" variant="outlined" fullWidth margin="normal" />}

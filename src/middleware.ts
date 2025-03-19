@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // Role-based access control
-    const userUnauthorizedRoutes = ["/invoices"];
+    const userUnauthorizedRoutes = ["/invoices", "/buyers"];
     if (userUnauthorizedRoutes.includes(url.pathname) && token.role === "user") {
       console.warn(`Unauthorized access attempt to ${url.pathname}`);
       return NextResponse.redirect(new URL("/unauthorized", req.url));
