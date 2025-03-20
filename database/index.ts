@@ -1,8 +1,5 @@
 import sequelize from "./config";
-import Customer from "./models/Customer";
-import Invoice from "./models/Invoice";
-import Item from "./models/Item";
-import User from "./models/User";
+
 
 const syncDatabase = async () => {
   try {

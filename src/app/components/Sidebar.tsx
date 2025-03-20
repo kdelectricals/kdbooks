@@ -2,7 +2,7 @@
 
 import {  useState } from "react";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, Divider, Tooltip } from "@mui/material";
-import { Home, Receipt, People, Settings, Menu, Logout, AccountBox, EventNote } from "@mui/icons-material";
+import { Home, Receipt, People, Settings, Menu, Logout, AccountBox, EventNote, Diversity3 } from "@mui/icons-material";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 const menuItems = [
   { text: "Dashboard", icon: <Home />, path: "/" },
   { text: "Invoices", icon: <Receipt />, path: "/invoices" },
+  { text: "Buyers", icon: <Diversity3 />, path: "/buyers" },
   { text: "To-Do List", icon: <EventNote />, path: "/todo" },
   { text: "Customers", icon: <People />, path: "/customers" },
   { text: "Settings", icon: <Settings />, path: "/settings" },
