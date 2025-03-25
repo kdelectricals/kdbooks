@@ -342,7 +342,7 @@ export default function CreateInvoice() {
       <Typography variant="h6" sx={{ fontWeight: "bold", borderBottom: "2px solid #ddd", mb: 2 }}>Bill To:</Typography>
       {selectedCustomer ? (
         <Grid>
-          <Typography sx={{ fontWeight: "bold" }}>{selectedCustomer.firstName} {selectedCustomer.lastName}</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{selectedCustomer.first_name} {selectedCustomer.first_name}</Typography>
           <Typography>{selectedCustomer.company || "Individual"}</Typography>
           <Typography>{selectedCustomer.address || "N/A"}</Typography>
           <Typography>{selectedCustomer.contact}</Typography>
