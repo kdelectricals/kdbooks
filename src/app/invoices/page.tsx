@@ -60,7 +60,7 @@ export default function CreateInvoice() {
   useEffect(() => {
     fetch("/api/buyers")
       .then((res) => res.json())
-      .then((data: Buyer[]) => setCustomers(data?.data))
+      .then((data: { data: Buyer[] }) => setCustomers(data.data))
       .catch((err) => console.error("Error fetching customers:", err));
       setCgst(9);
       setSgst(9) ;
@@ -342,7 +342,7 @@ export default function CreateInvoice() {
       <Typography variant="h6" sx={{ fontWeight: "bold", borderBottom: "2px solid #ddd", mb: 2 }}>Bill To:</Typography>
       {selectedCustomer ? (
         <Grid>
-          <Typography sx={{ fontWeight: "bold" }}>{selectedCustomer.firstName} {selectedCustomer.lastName}</Typography>
+          <Typography sx={{ fontWeight: "bold" }}>{selectedCustomer.first_name} {selectedCustomer.first_name}</Typography>
           <Typography>{selectedCustomer.company || "Individual"}</Typography>
           <Typography>{selectedCustomer.address || "N/A"}</Typography>
           <Typography>{selectedCustomer.contact}</Typography>
