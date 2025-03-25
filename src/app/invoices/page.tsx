@@ -60,7 +60,7 @@ export default function CreateInvoice() {
   useEffect(() => {
     fetch("/api/buyers")
       .then((res) => res.json())
-      .then((data: Buyer[]) => setCustomers(data?.data))
+      .then((data: { data: Buyer[] }) => setCustomers(data.data))
       .catch((err) => console.error("Error fetching customers:", err));
       setCgst(9);
       setSgst(9) ;
