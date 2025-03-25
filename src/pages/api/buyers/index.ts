@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else if (req.method === "PUT") {
       const { id } = req.query; // Fix: Extract ID from query
       const { first_name, last_name, email, mobile_number, address, updated_by } = req.body;
-      const buyer = await Buyer.findByPk(id);
+      const buyer = await Buyer.findByPk(id as string);
       if (!buyer) return res.status(404).json({ success: false, message: "Buyer not found" });
 
       await buyer.update({ first_name, last_name, email, mobile_number, address, updated_by });
@@ -35,6 +35,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(405).json({ success: false, message: "Method Not Allowed" });
     }
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    const err = error as Error;
+    return res.status(500).json({ success: false, error: err.message });
   }
 }
