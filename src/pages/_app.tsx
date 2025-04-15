@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { getSession } from "next-auth/react";
 import { SessionProvider } from "next-auth/react";
 
+
 export default function App({ Component, pageProps }: AppProps) {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
